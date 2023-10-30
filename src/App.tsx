@@ -15,10 +15,6 @@ class ComponentA extends Component {
     console.log(Object.getPrototypeOf(this._node.current))
     console.log(getComputedStyle(this._node.current!).position)
   }
-
-  // _setRef = (n: HTMLElement) => {
-  //   this._node = n
-  // }
 }
 
 function ComponentB() {
