@@ -1,56 +1,56 @@
-import { Button, Form, Input, Space } from "antd";
+import { Button, Drawer } from "antd";
+import { Component, createElement, createRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-const symbol = Symbol('symbol')
+class ComponentA extends Component {
+  _node = createRef<HTMLElement>()
 
-const getValue = () => {
-  return `value ${new Date().getTime()}`
+  render() {
+    return createElement('div', {
+      ref: this._node
+    }, 'component A')
+  }
+
+  componentDidMount(): void {
+    console.log('class component mounted')
+    console.log(Object.getPrototypeOf(this._node.current))
+    console.log(getComputedStyle(this._node.current!).position)
+  }
+
+  // _setRef = (n: HTMLElement) => {
+  //   this._node = n
+  // }
+}
+
+function ComponentB() {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    console.log('function component mounted')
+    console.log(Object.getPrototypeOf(ref.current))
+    console.log(getComputedStyle(ref.current!).position)
+  }, [])
+
+  return <div ref={ref}>componentB</div>
 }
 
 export default function App() {
-  const [form] = Form.useForm()
+  const [openA, setOpenA] = useState(false);
+  const [openB, setOpenB] = useState(false);
 
   return <>
-    <Space>
-      <Button onClick={() => {
-        const newValue = getValue()
+    <div> 
+      <div>drawer A include a class component</div>
+      <div>drawer B include a function component</div>
+      <div>both brawer set with forceRender</div>
+    </div>
+    <Button onClick={() => {setOpenA(true)}}>open drawerA</Button>
+    <Button onClick={() => {setOpenB(true)}}>open drawerB</Button>
 
-        form.setFieldValue('otherKey', newValue)
-        form.setFieldValue('key', { [symbol]: newValue, notSymbol: newValue })
-      }}>
-        set value with setFieldValue
-      </Button>
-      <Button onClick={() => {
-        const newValue = getValue()
-
-        form.setFieldsValue({
-          otherKey: newValue,
-          key: {
-            [symbol]: newValue,
-            notSymbol: newValue
-          }
-        })
-      }}>
-        set value with setFieldsValue
-      </Button>
-    </Space>
-    <Form form={form}>
-      <Form.Item name="otherKey">
-        <Input />
-      </Form.Item>
-
-      <Form.Item name="key" rules={[{required: true}]}>
-        {/* @ts-ignore */}
-        <Comp />
-      </Form.Item>
-    </Form>
+    <Drawer forceRender open={openA} onClose={() => {setOpenA(false)}}>
+      <ComponentA />
+    </Drawer>
+    <Drawer forceRender open={openB} onClose={() => {setOpenB(false)}}>
+      <ComponentB />
+    </Drawer>
   </>
-}
-
-function Comp({ value = {} }) {
-
-  return <Space direction="vertical">
-    <div>symbol: {value[symbol]}</div>
-    <div>notSymbol: {value.notSymbol}</div>
-  </Space>
-
 }
